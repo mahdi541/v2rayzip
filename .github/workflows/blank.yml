@@ -1,4 +1,4 @@
-name: Download, Split (40MB) and Commit
+name: Download, Split (15M) and Commit
 
 on:
   push:
