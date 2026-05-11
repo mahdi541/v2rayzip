@@ -1,4 +1,4 @@
-name: Download, Split (15M) and Commit
+name: Download and Create RAR Parts (15MB)
 
 on:
   push:
@@ -9,35 +9,41 @@ permissions:
   contents: write
 
 jobs:
-  split-file:
+  rar-split:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout
+      # 1. Checkout repo
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Download file
+      # 2. Install RAR (rar tool)
+      - name: Install RAR
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rar
+
+      # 3. Download file
       - name: Download v2rayN
         run: |
           mkdir -p downloads
           curl -L -o downloads/v2rayN.zip https://github.com/2dust/v2rayN/releases/download/7.21.3/v2rayN-windows-64.zip
 
-      # 3. Split into 40MB chunks
-      - name: Split file (40MB)
+      # 4. Create RAR volumes (15MB each)
+      - name: Create RAR parts
         run: |
-          mkdir -p chunks
-          split -b 15M downloads/v2rayN.zip chunks/v2rayN_part_
+          mkdir -p rar_parts
+          rar a -v15m rar_parts/v2rayN.rar downloads/v2rayN.zip
 
-      # 4. Git config
+      # 5. Git config
       - name: Set up Git
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
 
-      # 5. Commit & push
+      # 6. Commit & push
       - name: Commit and push
         run: |
-          git add chunks/
-          git commit -m "Add 40MB split archive" || echo "No changes"
+          git add rar_parts/
+          git commit -m "Add 15MB RAR split archive" || echo "No changes"
           git push
