@@ -1,16 +1,17 @@
-name: Download, Split and Commit
+name: Download, Split (40MB) and Commit
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   split-file:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout repo
+      # 1. Checkout
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -20,21 +21,21 @@ jobs:
           mkdir -p downloads
           curl -L -o downloads/v2rayN.zip https://github.com/2dust/v2rayN/releases/download/7.21.3/v2rayN-windows-64.zip
 
-      # 3. Split into chunks (50MB each)
-      - name: Split file
+      # 3. Split into 40MB chunks
+      - name: Split file (40MB)
         run: |
           mkdir -p chunks
-          split -b 50M downloads/v2rayN.zip chunks/v2rayN_part_
+          split -b 40M downloads/v2rayN.zip chunks/v2rayN_part_
 
-      # 4. Configure Git
+      # 4. Git config
       - name: Set up Git
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
 
-      # 5. Commit chunks
-      - name: Commit and push chunks
+      # 5. Commit & push
+      - name: Commit and push
         run: |
           git add chunks/
-          git commit -m "Add v2rayN split archive" || echo "No changes to commit"
+          git commit -m "Add 40MB split archive" || echo "No changes"
           git push
