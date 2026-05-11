@@ -27,7 +27,7 @@ jobs:
       - name: Split file (40MB)
         run: |
           mkdir -p chunks
-          split -b 40M downloads/v2rayN.zip chunks/v2rayN_part_
+          split -b 15M downloads/v2rayN.zip chunks/v2rayN_part_
 
       # 4. Git config
       - name: Set up Git
